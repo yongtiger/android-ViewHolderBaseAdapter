@@ -58,11 +58,11 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
         }else{
             vHolder = (ViewHolder) convertView.getTag();
         }
-        bindView(vHolder, getItem(position));
+        bindView(vHolder, position);
         return convertView;
     }
 
-    protected abstract void bindView(ViewHolder vHolder, T data);
+    protected abstract void bindView(ViewHolder vHolder,  int position);
 
     /**
      * Adds the specified object at the end of the list.

@@ -2,15 +2,10 @@ package cc.brainbook.adapter.viewholderbaseadapter;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -24,8 +19,7 @@ import java.util.Map;
 
 public class MainActivity extends ListActivity {
     private List<Map<String, Object>> mData;
-    //    MyAdapter adapter;
-    ViewHolderBaseAdapter adapter;
+    ViewHolderBaseAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,111 +27,105 @@ public class MainActivity extends ListActivity {
 //        setContentView(R.layout.activity_main);
 
         mData = getData();
-//        adapter = new MyAdapter(this);
 
-        ///BaseAppAdapter
-        adapter = new ViewHolderBaseAdapter(mData, R.layout.vlist2) {
+        mAdapter = new ViewHolderBaseAdapter<Map<String, Object>>(mData, R.layout.list_item) {
             @Override
-            protected void bindView(ViewHolder vHolder, Object data) {
-                ImageView viewImg = vHolder.getView(R.id.img);
-                Object a = ((HashMap)data).get("img");
-                viewImg.setImageResource(Integer.parseInt(a.toString()));
+            protected void bindView(ViewHolder holder, final int position) {
+                HashMap data = (HashMap) getItem(position);
 
-                TextView viewTitle = vHolder.getView(R.id.title);
-                viewTitle.setText(((HashMap)data).get("title").toString());
+                TextView title = holder.getView(R.id.tv_title);
+                title.setText(data.get("title").toString());
 
-                TextView viewInfo = vHolder.getView(R.id.info);
-                viewInfo.setText(((HashMap)data).get("info").toString());
+                TextView info = holder.getView(R.id.tv_info);
+                info.setText(data.get("info").toString());
+
+                ///test case: image
+                ImageView img = holder.getView(R.id.iv_img);
+                Object objImg = data.get("img");
+                img.setImageResource(Integer.parseInt(objImg.toString()));
+
+                ///test case: click event listener
+                Button btn = holder.getView(R.id.btn_view);
+//                btn.setTag(position); ///alternative: pass position within tag
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+//                        int position = Integer.parseInt(v.getTag().toString()); ///alternative: pass position within tag
+
+                        ///test case: showInfo(position)
+                        showInfo(position);
+
+                        ///test case: remove(position)
+//                        mData.remove(position);
+
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         };
 
-        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
-        ///adapter.sort()
+        ///test case: mAdapter.sort()
         ///https://stackoverflow.com/questions/9906464/sort-listview-with-array-adapter
-        adapter.sort(new Comparator<HashMap>() {
+        mAdapter.sort(new Comparator<HashMap>() {
             @Override
             public int compare(HashMap lhs, HashMap rhs) {
-                return lhs.get("title").toString().compareTo(rhs.get("title").toString());
 //                return lhs.compareTo(rhs);
+                return lhs.get("title").toString().compareTo(rhs.get("title").toString());
             }
         });
 
-        setListAdapter(adapter);
+        setListAdapter(mAdapter);
     }
 
+    private List getData() {
+        final List list = new ArrayList();
 
-    private List<Map<String, Object>> getData() {
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("title", "G1");
-        map.put("info", "google 1");
-        map.put("img", R.drawable.i1);
-        list.add(map);
-
-        map = new HashMap<String, Object>();
-        map.put("title", "G2");
-        map.put("info", "google 2");
-        map.put("img", R.drawable.i2);
-        list.add(map);
-
-        map = new HashMap<String, Object>();
-        map.put("title", "G3");
-        map.put("info", "google 3");
-        map.put("img", R.drawable.i3);
-        list.add(map);
+        ///demo data for test
+        for(int i = 0; i < 100; i++) {
+            final HashMap map = new HashMap();
+            map.put("title", "G" + i);
+            map.put("info", "google " + i);
+            if (i % 3 == 0) {
+                map.put("img", R.drawable.i1);
+            } else if (i % 3 == 1) {
+                map.put("img", R.drawable.i2);
+            } else if (i % 3 == 2) {
+                map.put("img", R.drawable.i3);
+            }
+            list.add(map);
+        }
 
         return list;
     }
 
-    // ListView 中某项被选中后的逻辑
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+        Log.v("TAG", mData.get(position).get("title").toString());
 
-        Log.v("TAG", (String)mData.get(position).get("title"));
-//        showInfo();
-//        adapter.remove(position);
-        adapter.clear();
+        ///test case: showInfo(position)
+        showInfo(position);
+
+        ///test case: remove(position)
+//        mAdapter.remove(position);
+
+        ///test case: clear()
+//        mAdapter.clear();
     }
 
-    /**
-     * listview中点击按键弹出对话框
-     */
-    public void showInfo(){
+    public void showInfo(final int position) {
         new AlertDialog.Builder(this)
-                .setTitle("我的listview")
-                .setMessage("介绍...")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
+        .setTitle("Alert Dialog")
+        .setMessage("Position: " + position)
+        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
+                ///test case: remove(position)
+                mAdapter.remove(position);
+
+            }
+        })
+        .show();
     }
 
-
-
-    public final class ViewHolder{
-        public ImageView img;
-        public TextView title;
-        public TextView info;
-        public Button viewBtn;
-    }
-
-
-
-    /**
-     * 删除按钮的监听接口
-     */
-    public interface onItemDeleteListener {
-        void onDeleteClick(int i);
-    }
-
-    private onItemDeleteListener mOnItemDeleteListener;
-
-    public void setOnItemDeleteClickListener(onItemDeleteListener mOnItemDeleteListener) {
-        this.mOnItemDeleteListener = mOnItemDeleteListener;
-    }
 }

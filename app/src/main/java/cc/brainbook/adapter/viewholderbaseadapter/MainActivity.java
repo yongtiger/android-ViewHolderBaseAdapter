@@ -1,12 +1,18 @@
 package cc.brainbook.adapter.viewholderbaseadapter;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,16 +21,26 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends Activity {
+    private ListView mList;
     private List<Map<String, Object>> mData;
-    ViewHolderBaseAdapter mAdapter;
+    private ViewHolderBaseAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+
+
+        mList = findViewById(R.id.lv_list_view);
+
+        ///test case: CHOICE_MODE_SINGLE
+//        mList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        mList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
 
         mData = getData();
 
@@ -77,21 +93,62 @@ public class MainActivity extends ListActivity {
         });
 
 
-        ///test case: CHOICE_MODE_SINGLE
-//        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-        setListAdapter(mAdapter);
-
-
         ///test case: mAdapter.getFilter()
-        mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<HashMap<String, Object>>() {
-            @Override
-            public boolean filterCompare(HashMap<String, Object> object, CharSequence constraint) {
-                return object.get("title").toString().toLowerCase().indexOf(constraint.toString().toLowerCase()) != -1;
-            }
-        }).filter("G2");
+//        mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<HashMap<String, Object>>() {
+//            @Override
+//            public boolean filterCompare(HashMap<String, Object> object, CharSequence constraint) {
+//                return object.get("title").toString().toLowerCase().indexOf(constraint.toString().toLowerCase()) != -1;
+//            }
+//        }).filter("G2");
 
+
+        ///test case: Capture Text in EditText, and then mAdapter.getFilter()
+        // https://www.androidbegin.com/tutorial/android-search-listview-using-filter/
+        final EditText editText = findViewById(R.id.et_edit_text);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                // TODO Auto-generated method stub
+                final String constraintString = editText.getText().toString().toLowerCase(Locale.getDefault());
+                mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<HashMap<String, Object>>() {
+                    @Override
+                    public boolean filterCompare(HashMap<String, Object> object, CharSequence constraint) {
+                        final String str = constraint.toString().trim();
+                        return object.get("title").toString().toLowerCase(Locale.getDefault()).indexOf(str) != -1;
+                    }
+                }).filter(constraintString);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+
+        mList.setAdapter(mAdapter);
+
+
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Log.d("TAG", "onItemClick: ");
+
+                ///test case: showInfo(position)
+                showInfo(position);
+
+                ///test case: remove(position)
+//                mAdapter.remove(position);
+
+                ///test case: clear()
+//                mAdapter.clear();
+            }
+        });
     }
 
     private List getData() {
@@ -115,20 +172,6 @@ public class MainActivity extends ListActivity {
         return list;
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Log.d("TAG", "onListItemClick: ");
-
-        ///test case: showInfo(position)
-        showInfo(position);
-
-        ///test case: remove(position)
-//        mAdapter.remove(position);
-
-        ///test case: clear()
-//        mAdapter.clear();
-    }
-
     public void showInfo(final int position) {
         new AlertDialog.Builder(this)
         .setTitle("Alert Dialog")
@@ -144,5 +187,4 @@ public class MainActivity extends ListActivity {
         })
         .show();
     }
-
 }

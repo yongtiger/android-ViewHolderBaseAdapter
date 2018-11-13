@@ -50,6 +50,7 @@ public class MainActivity extends ListActivity {
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.d("TAG", "btn.onClick: ");
 //                        int position = Integer.parseInt(v.getTag().toString()); ///alternative: pass position within tag
 
                         ///test case: showInfo(position)
@@ -64,6 +65,7 @@ public class MainActivity extends ListActivity {
             }
         };
 
+
         ///test case: mAdapter.sort()
         ///https://stackoverflow.com/questions/9906464/sort-listview-with-array-adapter
         mAdapter.sort(new Comparator<HashMap>() {
@@ -74,7 +76,22 @@ public class MainActivity extends ListActivity {
             }
         });
 
+
+        ///test case: CHOICE_MODE_SINGLE
+//        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
         setListAdapter(mAdapter);
+
+
+        ///test case: mAdapter.getFilter()
+        mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<HashMap<String, Object>>() {
+            @Override
+            public boolean filterCompare(HashMap<String, Object> object, CharSequence constraint) {
+                return object.get("title").toString().toLowerCase().indexOf(constraint.toString().toLowerCase()) != -1;
+            }
+        }).filter("G2");
+
     }
 
     private List getData() {
@@ -100,7 +117,7 @@ public class MainActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Log.v("TAG", mData.get(position).get("title").toString());
+        Log.d("TAG", "onListItemClick: ");
 
         ///test case: showInfo(position)
         showInfo(position);

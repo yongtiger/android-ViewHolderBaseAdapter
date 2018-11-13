@@ -7,40 +7,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
- * Description.
+ * Class ViewHolderBaseAdapter
  *
  * @author Robert Han
  * @email brainbook.cc@outlook.com
  * @website www.brainbook.cc
  * @time 2018/7/5 18:20
  */
-///https://blog.csdn.net/lisdye2/article/details/51449707
-///https://blog.csdn.net/lpCrazyBoy/article/details/80732517
-public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
-
-    private List<T> mData;
+public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements Filterable {
+    private List<T> mObjects;
     private int mLayoutRes;
 
     public ViewHolderBaseAdapter(List<T> data, int layoutRes) {
-        this.mData = data;
+        this.mObjects = data;
         this.mLayoutRes = layoutRes;
     }
 
     @Override
     public int getCount() {
-        return mData == null ? 0 : mData.size();
+        return mObjects == null ? 0 : mObjects.size();
     }
 
     @Override
     public T getItem(int position) {
-        return mData.get(position);
+        return mObjects.get(position);
     }
 
     @Override
@@ -70,7 +70,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * @param object The object to add at the end of the list.
      */
     public void add(@Nullable T object) {
-        mData.add(object);
+        mObjects.add(object);
         notifyDataSetChanged();
     }
 
@@ -89,7 +89,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      *         specified collection prevents it from being added to this list
      */
     public void addAll(@NonNull Collection<? extends T> collection) {
-        mData.addAll(collection);
+        mObjects.addAll(collection);
         notifyDataSetChanged();
     }
 
@@ -99,7 +99,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * @param items The items to add at the end of the list.
      */
     public void addAll(T ... items) {
-        Collections.addAll(mData, items);
+        Collections.addAll(mObjects, items);
         notifyDataSetChanged();
     }
 
@@ -110,7 +110,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * @param index The index at which the object must be inserted.
      */
     public void insert(@Nullable T object, int index) {
-        mData.add(index, object);
+        mObjects.add(index, object);
         notifyDataSetChanged();
     }
 
@@ -120,8 +120,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * @param object The object to remove.
      */
     public void remove(@Nullable T object) {
-        if (mData != null) {
-            mData.remove(object);
+        if (mObjects != null) {
+            mObjects.remove(object);
             notifyDataSetChanged();
         }
     }
@@ -132,8 +132,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * @param index The index to remove.
      */
     public void remove(int index) {
-        if (mData != null) {
-            mData.remove(index);
+        if (mObjects != null) {
+            mObjects.remove(index);
             notifyDataSetChanged();
         }
     }
@@ -142,8 +142,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * Remove all elements from the list.
      */
     public void clear() {
-        if (mData != null) {
-            mData.clear();
+        if (mObjects != null) {
+            mObjects.clear();
             notifyDataSetChanged();
         }
     }
@@ -155,7 +155,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      *        in this adapter.
      */
     public void sort(@NonNull Comparator<? super T> comparator) {
-        Collections.sort(mData, comparator);
+        Collections.sort(mObjects, comparator);
         notifyDataSetChanged();
     }
 
@@ -167,9 +167,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
      * @return The position of the specified item.
      */
     public int getPosition(@Nullable T item) {
-        return mData.indexOf(item);
+        return mObjects.indexOf(item);
     }
-
 
     /**
      * Class ViewHolder
@@ -177,7 +176,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
     public static class ViewHolder {
 
         private View mConvertView;
-        private SparseArray<View> mViews;   ///https://blog.csdn.net/lpCrazyBoy/article/details/80732517
+        private SparseArray<View> mViews;
 
         public ViewHolder(View convertView) {
             this.mConvertView = convertView;
@@ -193,5 +192,107 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter {
             }
             return view;
         }
+    }
+
+
+    /* -------------------------------- Customize filter -------------------------------- */
+    // https://www.jb51.net/article/109480.htm
+
+    /**
+     * Lock used to modify the content of {@link #mObjects}. Any write operation
+     * performed on the list should be synchronized on this lock. This lock is also
+     * used by the filter (see {@link #getFilter()} to make a synchronized copy of
+     * the original list of data.
+     */
+    private final Object mLock = new Object();
+
+    // A copy of the original mObjects list, initialized from and then used instead as soon as
+    // the mFilter ListFilter is used. mObjects will then only contain the filtered values.
+    private List<T> mOriginalValues;
+    private ListFilter mFilter;
+
+    public Filter getFilter(FilterCompareCallback filterCompareCallback) {
+        mFilter = (ListFilter) getFilter();
+        mFilter.setFilterCompareCallback(filterCompareCallback);
+        return mFilter;
+    }
+    public Filter getFilter() {
+        if (mFilter == null) {
+            mFilter = new ListFilter();
+        }
+        return mFilter;
+    }
+
+    /**
+     * <p>An list filter constrains the content of the base adapter with
+     * a string. It will compare each item with FilterCompareCallback.filterCompare(),
+     * and remove from the list that does not match the supplied string.</p>
+     *
+     * https://stackoverflow.com/questions/14663725/list-view-filter-android
+     */
+    private class ListFilter extends Filter {
+        private FilterCompareCallback mFilterCompareCallback;
+        public void setFilterCompareCallback(FilterCompareCallback filterCompareCallback) {
+            mFilterCompareCallback = filterCompareCallback;
+        }
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            if (mOriginalValues == null) {
+                synchronized (mLock) {
+                    mOriginalValues = new ArrayList<T>(mObjects);
+                }
+            }
+
+            if (constraint == null || constraint.length() == 0) {
+                ArrayList<T> list;
+                synchronized (mLock) {
+                    list = new ArrayList<T>(mOriginalValues);
+                }
+                results.values = list;
+                results.count = list.size();
+            } else {
+                ArrayList<T> values;
+                synchronized (mLock) {
+                    values = new ArrayList<T>(mOriginalValues);
+                }
+
+                final int count = values.size();
+                final ArrayList<T> newValues = new ArrayList<T>();
+
+                for (int i = 0; i < count; i++) {
+                    final T value = values.get(i);
+
+                    if (mFilterCompareCallback.filterCompare(value, constraint)) {
+                        newValues.add(value);
+                    }
+                }
+
+                results.values = newValues;
+                results.count = newValues.size();
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            //noinspection unchecked
+            mObjects = (List<T>) results.values;
+            if (results.count > 0) {
+                notifyDataSetChanged();
+            } else {
+                notifyDataSetInvalidated();
+            }
+        }
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when a filter is used in comparing.
+     */
+    public interface FilterCompareCallback<T> {
+        boolean filterCompare(@Nullable T object, CharSequence constraint);
     }
 }

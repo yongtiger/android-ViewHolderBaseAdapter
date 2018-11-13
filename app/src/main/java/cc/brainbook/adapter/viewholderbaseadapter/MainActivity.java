@@ -108,13 +108,12 @@ public class MainActivity extends Activity {
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable arg0) {
-                // TODO Auto-generated method stub
-                final String constraintString = editText.getText().toString().toLowerCase(Locale.getDefault());
+                final String constraintString = arg0.toString().trim().toLowerCase(Locale.getDefault());
+//                final String constraintString = editText.getText().toString().trim().toLowerCase(Locale.getDefault());
                 mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<HashMap<String, Object>>() {
                     @Override
                     public boolean filterCompare(HashMap<String, Object> object, CharSequence constraint) {
-                        final String str = constraint.toString().trim();
-                        return object.get("title").toString().toLowerCase(Locale.getDefault()).indexOf(str) != -1;
+                        return object.get("title").toString().toLowerCase(Locale.getDefault()).indexOf(constraint.toString()) != -1;
                     }
                 }).filter(constraintString);
             }

@@ -88,9 +88,10 @@ public class MainActivity extends Activity {
             @Override
             public int compare(HashMap lhs, HashMap rhs) {
 //                return lhs.compareTo(rhs);
-                return lhs.get("title").toString().compareTo(rhs.get("title").toString());
+                return rhs.get("title").toString().compareTo(lhs.get("title").toString());
             }
         });
+        mAdapter.reset();
 
 
         ///test case: mAdapter.getFilter()

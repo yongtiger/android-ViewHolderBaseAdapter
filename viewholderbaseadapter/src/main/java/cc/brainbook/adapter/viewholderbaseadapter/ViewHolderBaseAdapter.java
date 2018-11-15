@@ -139,11 +139,23 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     }
 
     /**
-     * Remove all elements from the list.
+     * Removes all elements from the list.
      */
     public void clear() {
         if (mObjects != null) {
             mObjects.clear();
+            notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Resets all elements from the original list.
+     */
+    public void reset() {
+        if (mOriginalValues != null) {
+            synchronized (mLock) {
+                mObjects = new ArrayList<T>(mOriginalValues);
+            }
             notifyDataSetChanged();
         }
     }
@@ -155,6 +167,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      *        in this adapter.
      */
     public void sort(@NonNull Comparator<? super T> comparator) {
+        if (mOriginalValues == null) {
+            synchronized (mLock) {
+                mOriginalValues = new ArrayList<T>(mObjects);
+            }
+        }
+
         Collections.sort(mObjects, comparator);
         notifyDataSetChanged();
     }

@@ -91,6 +91,7 @@ public class MainActivity extends Activity {
                 return rhs.get("title").toString().compareTo(lhs.get("title").toString());
             }
         });
+        
         mAdapter.reset();
 
 

@@ -172,12 +172,16 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * Resets all elements from the original list.
      */
     public void reset() {
-        if (mOriginalValues != null) {
+        if (mNewValues != null) {
+            synchronized (mLock) {
+                mObjects = new ArrayList<T>(mNewValues);
+            }
+        } else if (mOriginalValues != null) {
             synchronized (mLock) {
                 mObjects = new ArrayList<T>(mOriginalValues);
             }
-            notifyDataSetChanged();
         }
+        notifyDataSetChanged();
     }
 
     /**
@@ -238,6 +242,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     /* -------------------------------- Customize filter -------------------------------- */
     // https://www.jb51.net/article/109480.htm
     private ListFilter mFilter;
+    private ArrayList<T> mNewValues;
 
     public Filter getFilter(FilterCompareCallback filterCompareCallback) {
         mFilter = (ListFilter) getFilter();
@@ -288,18 +293,18 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
                 }
 
                 final int count = values.size();
-                final ArrayList<T> newValues = new ArrayList<T>();
+                mNewValues = new ArrayList<T>();
 
                 for (int i = 0; i < count; i++) {
                     final T value = values.get(i);
 
                     if (mFilterCompareCallback.filterCompare(value, constraint)) {
-                        newValues.add(value);
+                        mNewValues.add(value);
                     }
                 }
 
-                results.values = newValues;
-                results.count = newValues.size();
+                results.values = mNewValues;
+                results.count = mNewValues.size();
             }
 
             return results;

@@ -28,6 +28,18 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     private List<T> mObjects;
     private int mLayoutRes;
 
+    /**
+     * Lock used to modify the content of {@link #mObjects}. Any write operation
+     * performed on the list should be synchronized on this lock. This lock is also
+     * used by the filter (see {@link #getFilter()} to make a synchronized copy of
+     * the original list of data.
+     */
+    private final Object mLock = new Object();
+
+    // A copy of the original mObjects list, initialized from and then used instead as soon as
+    // the mFilter ListFilter is used. mObjects will then only contain the filtered values.
+    private List<T> mOriginalValues;
+
     public ViewHolderBaseAdapter(List<T> data, int layoutRes) {
         this.mObjects = data;
         this.mLayoutRes = layoutRes;
@@ -70,7 +82,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * @param object The object to add at the end of the list.
      */
     public void add(@Nullable T object) {
-        mObjects.add(object);
+        synchronized (mLock) {
+            mObjects.add(object);
+        }
         notifyDataSetChanged();
     }
 
@@ -89,7 +103,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      *         specified collection prevents it from being added to this list
      */
     public void addAll(@NonNull Collection<? extends T> collection) {
-        mObjects.addAll(collection);
+        synchronized (mLock) {
+            mObjects.addAll(collection);
+        }
         notifyDataSetChanged();
     }
 
@@ -99,7 +115,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * @param items The items to add at the end of the list.
      */
     public void addAll(T ... items) {
-        Collections.addAll(mObjects, items);
+        synchronized (mLock) {
+            Collections.addAll(mObjects, items);
+        }
         notifyDataSetChanged();
     }
 
@@ -110,7 +128,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * @param index The index at which the object must be inserted.
      */
     public void insert(@Nullable T object, int index) {
-        mObjects.add(index, object);
+        synchronized (mLock) {
+            mObjects.add(index, object);
+        }
         notifyDataSetChanged();
     }
 
@@ -120,10 +140,10 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * @param object The object to remove.
      */
     public void remove(@Nullable T object) {
-        if (mObjects != null) {
+        synchronized (mLock) {
             mObjects.remove(object);
-            notifyDataSetChanged();
         }
+        notifyDataSetChanged();
     }
 
     /**
@@ -132,20 +152,20 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * @param index The index to remove.
      */
     public void remove(int index) {
-        if (mObjects != null) {
+        synchronized (mLock) {
             mObjects.remove(index);
-            notifyDataSetChanged();
         }
+        notifyDataSetChanged();
     }
 
     /**
      * Removes all elements from the list.
      */
     public void clear() {
-        if (mObjects != null) {
+        synchronized (mLock) {
             mObjects.clear();
-            notifyDataSetChanged();
         }
+        notifyDataSetChanged();
     }
 
     /**
@@ -173,7 +193,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             }
         }
 
-        Collections.sort(mObjects, comparator);
+        synchronized (mLock) {
+            Collections.sort(mObjects, comparator);
+        }
         notifyDataSetChanged();
     }
 
@@ -215,18 +237,6 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
 
     /* -------------------------------- Customize filter -------------------------------- */
     // https://www.jb51.net/article/109480.htm
-
-    /**
-     * Lock used to modify the content of {@link #mObjects}. Any write operation
-     * performed on the list should be synchronized on this lock. This lock is also
-     * used by the filter (see {@link #getFilter()} to make a synchronized copy of
-     * the original list of data.
-     */
-    private final Object mLock = new Object();
-
-    // A copy of the original mObjects list, initialized from and then used instead as soon as
-    // the mFilter ListFilter is used. mObjects will then only contain the filtered values.
-    private List<T> mOriginalValues;
     private ListFilter mFilter;
 
     public Filter getFilter(FilterCompareCallback filterCompareCallback) {

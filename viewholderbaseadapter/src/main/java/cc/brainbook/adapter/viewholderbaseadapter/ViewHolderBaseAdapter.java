@@ -238,9 +238,15 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
                         final ArrayList<T> list = new ArrayList<T>();
                         for (int i = 0; i < count; i++) {
                             final T value = mOriginalValues.get(i);
-
-                            if (mNewFilterValues.contains(value)) {
-                                list.add(value);
+                            // http://www.importnew.com/18700.html
+//                            if (mNewFilterValues.contains(value)) {
+//                                list.add(value);
+//                            }
+                            for (T object : mNewFilterValues) {
+                                if (object.equals(value)) {
+                                    list.add(value);
+                                    break;
+                                }
                             }
                         }
                         mObjects = list;
@@ -271,8 +277,15 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             final ArrayList<T> list = new ArrayList<T>();
             for (int i = 0; i < count; i++) {
                 final T value = mNewSortValues.get(i);
-                if (mObjects.contains(value)) {
-                    list.add(value);
+                // http://www.importnew.com/18700.html
+//                if (mObjects.contains(value)) {
+//                    list.add(value);
+//                }
+                for (T object : mObjects) {
+                    if (object.equals(value)) {
+                        list.add(value);
+                        break;
+                    }
                 }
             }
 

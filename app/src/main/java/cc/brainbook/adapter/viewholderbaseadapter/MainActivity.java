@@ -273,7 +273,7 @@ public class MainActivity extends Activity {
         final List list = new ArrayList();
 
         ///demo data for test
-        for(int i = 0; i < 100; i++) {
+        for(int i = 0; i < 1000; i++) {
             final HashMap map = new HashMap();
             map.put("title", "G" + i);
             map.put("info", "google " + i);

@@ -3,18 +3,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <EditText
-        android:id="@+id/et_edit_text"
+    <LinearLayout
+        android:id="@+id/ll_buttons"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
+        <Button android:id="@+id/btn_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="排序" />
+
+        <Button android:id="@+id/btn_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="筛选" />
+
+        <Button android:id="@+id/btn_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="重置" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/et_filter_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_buttons"
+        android:visibility="gone">
         <requestFocus />
     </EditText>
 
+    <!-- ListView用match_parent或固定尺寸，不要用wrap_content!否则getView会被多次调用影响效率。
+     还要注意一点，当是引入布局的时候，也需要设置它的父元素的高为match_parent -->
     <ListView
         android:id="@+id/lv_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/et_edit_text" />
+        android:layout_below="@id/et_filter_text"
+        android:layout_above="@id/reverse_sel"
+        android:choiceMode="multipleChoice"
+        android:fastScrollEnabled="true" />
+
+    <Button android:id="@+id/reverse_sel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/all_sel"
+        android:text="反选" />
+    <Button android:id="@+id/all_sel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/all_unsel"
+        android:text="全选" />
+    <Button android:id="@+id/all_unsel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="全部取消" />
 
 </RelativeLayout>

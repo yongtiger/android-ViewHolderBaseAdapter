@@ -36,8 +36,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     private final Object mLock = new Object();
 
-    // A copy of the original mObjects list, initialized from and then used instead as soon as
-    // the mFilter ListFilter is used. mObjects will then only contain the filtered values.
+    // A copy of the original mObjects list, initialized from after sort() or filter().
     private List<T> mOriginalValues;
 
     public ViewHolderBaseAdapter(List<T> data, int layoutRes) {
@@ -169,41 +168,6 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     }
 
     /**
-     * Resets all elements from the original list.
-     */
-    public void reset() {
-        if (mNewValues != null) {
-            synchronized (mLock) {
-                mObjects = new ArrayList<T>(mNewValues);
-            }
-        } else if (mOriginalValues != null) {
-            synchronized (mLock) {
-                mObjects = new ArrayList<T>(mOriginalValues);
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    /**
-     * Sorts the content of this adapter using the specified comparator.
-     *
-     * @param comparator The comparator used to sort the objects contained
-     *        in this adapter.
-     */
-    public void sort(@NonNull Comparator<? super T> comparator) {
-        if (mOriginalValues == null) {
-            synchronized (mLock) {
-                mOriginalValues = new ArrayList<T>(mObjects);
-            }
-        }
-
-        synchronized (mLock) {
-            Collections.sort(mObjects, comparator);
-        }
-        notifyDataSetChanged();
-    }
-
-    /**
      * Returns the position of the specified item in the list.
      *
      * @param item The item to retrieve the position of.
@@ -238,11 +202,90 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
         }
     }
 
+    /**
+     * Resets all elements from the original list.
+     *
+     * If mOriginalValues is not null, that means after calling sort() or filter(), then resets mObjects with mOriginalValues.
+     */
+    public void reset() {
+        mNewSortValues = null;
+        mNewFilterValues = null;
+        if (mOriginalValues != null) {
+            synchronized (mLock) {
+                mObjects = new ArrayList<T>(mOriginalValues);
+            }
+            notifyDataSetChanged();
+            mOriginalValues = null;
+        }
+    }
+
+
+    /* -------------------------------- Customize sort -------------------------------- */
+    private ArrayList<T> mNewSortValues;
+
+    /**
+     * Sorts the content of this adapter using the specified comparator.
+     *
+     * @param comparator The comparator used to sort the objects contained
+     *        in this adapter.
+     */
+    public void sort(Comparator<? super T> comparator) {
+        if (comparator == null) {
+            if (mOriginalValues != null) {
+                if (mNewFilterValues != null) {
+                    synchronized (mLock) {
+                        final int count = mOriginalValues.size();
+                        final ArrayList<T> list = new ArrayList<T>();
+                        for (int i = 0; i < count; i++) {
+                            final T value = mOriginalValues.get(i);
+
+                            if (mNewFilterValues.contains(value)) {
+                                list.add(value);
+                            }
+                        }
+                        mObjects = list;
+                    }
+                    notifyDataSetChanged();
+                } else {
+                    synchronized (mLock) {
+                        mObjects = new ArrayList<T>(mOriginalValues);
+                    }
+                    notifyDataSetChanged();
+                }
+            }
+
+            mNewSortValues = null;
+        } else {
+            if (mOriginalValues == null) {
+                synchronized (mLock) {
+                    mOriginalValues = new ArrayList<T>(mObjects);
+                }
+            }
+
+            synchronized (mLock) {
+                mNewSortValues = new ArrayList<T>(mOriginalValues);
+                Collections.sort(mNewSortValues, comparator);
+            }
+
+            final int count = mNewSortValues.size();
+            final ArrayList<T> list = new ArrayList<T>();
+            for (int i = 0; i < count; i++) {
+                final T value = mNewSortValues.get(i);
+                if (mObjects.contains(value)) {
+                    list.add(value);
+                }
+            }
+
+            mObjects = list;
+            notifyDataSetChanged();
+        }
+    }
+
 
     /* -------------------------------- Customize filter -------------------------------- */
     // https://www.jb51.net/article/109480.htm
     private ListFilter mFilter;
-    private ArrayList<T> mNewValues;
+    private ArrayList<T> mNewFilterValues;
 
     public Filter getFilter(FilterCompareCallback filterCompareCallback) {
         mFilter = (ListFilter) getFilter();
@@ -280,33 +323,37 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             }
 
             if (constraint == null || constraint.length() == 0) {
-                ArrayList<T> list;
+                ArrayList<T> values;
                 synchronized (mLock) {
-                    list = new ArrayList<T>(mOriginalValues);
+                    if (mNewSortValues != null) {
+                        values = new ArrayList<T>(mNewSortValues);
+                    } else {
+                        values = new ArrayList<T>(mOriginalValues);
+                    }
                 }
-                results.values = list;
-                results.count = list.size();
+                mNewFilterValues = values;
             } else {
                 ArrayList<T> values;
                 synchronized (mLock) {
-                    values = new ArrayList<T>(mOriginalValues);
-                }
-
-                final int count = values.size();
-                mNewValues = new ArrayList<T>();
-
-                for (int i = 0; i < count; i++) {
-                    final T value = values.get(i);
-
-                    if (mFilterCompareCallback.filterCompare(value, constraint)) {
-                        mNewValues.add(value);
+                    if (mNewSortValues != null) {
+                        values = new ArrayList<T>(mNewSortValues);
+                    } else {
+                        values = new ArrayList<T>(mOriginalValues);
                     }
                 }
 
-                results.values = mNewValues;
-                results.count = mNewValues.size();
+                final int count = values.size();
+                mNewFilterValues = new ArrayList<T>();
+                for (int i = 0; i < count; i++) {
+                    final T value = values.get(i);
+                    if (mFilterCompareCallback.filterCompare(value, constraint)) {
+                        mNewFilterValues.add(value);
+                    }
+                }
             }
 
+            results.values = mNewFilterValues;
+            results.count = mNewFilterValues.size();
             return results;
         }
 

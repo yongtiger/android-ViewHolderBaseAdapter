@@ -140,6 +140,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public void remove(@Nullable T object) {
         synchronized (mLock) {
+            if (mNewSortValues != null) mNewSortValues.remove(object);
+            if (mNewFilterValues != null) mNewFilterValues.remove(object);
+            if (mOriginalValues != null) mOriginalValues.remove(object);
             mObjects.remove(object);
         }
         notifyDataSetChanged();
@@ -152,6 +155,10 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public void remove(int index) {
         synchronized (mLock) {
+            final T object = mObjects.get(index);
+            if (mNewSortValues != null) mNewSortValues.remove(object);
+            if (mNewFilterValues != null) mNewFilterValues.remove(object);
+            if (mOriginalValues != null) mOriginalValues.remove(object);
             mObjects.remove(index);
         }
         notifyDataSetChanged();
@@ -163,6 +170,9 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     public void clear() {
         synchronized (mLock) {
             mObjects.clear();
+            if (mNewSortValues != null) mNewSortValues.clear();
+            if (mNewFilterValues != null) mNewFilterValues.clear();
+            if (mOriginalValues != null) mOriginalValues.clear();
         }
         notifyDataSetChanged();
     }

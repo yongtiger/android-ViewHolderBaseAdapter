@@ -36,6 +36,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     private final Object mLock = new Object();
 
+    /**
+     * Indicates whether or not {@link #notifyDataSetChanged()} must be called whenever
+     * {@link #mObjects} is modified.
+     */
+    private boolean mNotifyOnChange = true;
+
     // A copy of the original mObjects list, initialized from after sort() or filter().
     private List<T> mOriginalValues;
 
@@ -50,8 +56,19 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     }
 
     @Override
-    public T getItem(int position) {
+    public @Nullable T getItem(int position) {
         return mObjects.get(position);
+    }
+
+    /**
+     * Returns the position of the specified item in the list.
+     *
+     * @param item The item to retrieve the position of.
+     *
+     * @return The position of the specified item.
+     */
+    public int getPosition(@Nullable T item) {
+        return mObjects.indexOf(item);
     }
 
     @Override
@@ -60,7 +77,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public @NonNull View getView(int position, @Nullable View convertView, @Nullable ViewGroup parent) {
         ViewHolder vHolder;
         if(convertView == null){
             convertView = LayoutInflater.from(parent.getContext()).inflate(mLayoutRes, parent,false);
@@ -75,6 +92,30 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
 
     protected abstract void bindView(ViewHolder vHolder,  int position);
 
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        mNotifyOnChange = true;
+    }
+
+    /**
+     * Control whether methods that change the list ({@link #add}, {@link #addAll(Collection)},
+     * {@link #addAll(Object[])}, {@link #insert}, {@link #remove}, {@link #clear},
+     * {@link #sort(Comparator)}) automatically call {@link #notifyDataSetChanged}.  If set to
+     * false, caller must manually call notifyDataSetChanged() to have the changes
+     * reflected in the attached view.
+     *
+     * The default is true, and calling notifyDataSetChanged()
+     * resets the flag to true.
+     *
+     * @param notifyOnChange if true, modifications to the list will
+     *                       automatically call {@link
+     *                       #notifyDataSetChanged}
+     */
+    public void setNotifyOnChange(boolean notifyOnChange) {
+        mNotifyOnChange = notifyOnChange;
+    }
+
     /**
      * Adds the specified object at the end of the list.
      *
@@ -82,9 +123,13 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public void add(@Nullable T object) {
         synchronized (mLock) {
-            mObjects.add(object);
+            if (mOriginalValues != null) {
+                mOriginalValues.add(object);
+            } else {
+                mObjects.add(object);
+            }
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -103,9 +148,13 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public void addAll(@NonNull Collection<? extends T> collection) {
         synchronized (mLock) {
-            mObjects.addAll(collection);
+            if (mOriginalValues != null) {
+                mOriginalValues.addAll(collection);
+            } else {
+                mObjects.addAll(collection);
+            }
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -115,9 +164,13 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public void addAll(T ... items) {
         synchronized (mLock) {
-            Collections.addAll(mObjects, items);
+            if (mOriginalValues != null) {
+                Collections.addAll(mOriginalValues, items);
+            } else {
+                Collections.addAll(mObjects, items);
+            }
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -128,9 +181,13 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public void insert(@Nullable T object, int index) {
         synchronized (mLock) {
-            mObjects.add(index, object);
+            if (mOriginalValues != null) {
+                mOriginalValues.add(index, object);
+            } else {
+                mObjects.add(index, object);
+            }
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -175,17 +232,6 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             if (mOriginalValues != null) mOriginalValues.clear();
         }
         notifyDataSetChanged();
-    }
-
-    /**
-     * Returns the position of the specified item in the list.
-     *
-     * @param item The item to retrieve the position of.
-     *
-     * @return The position of the specified item.
-     */
-    public int getPosition(@Nullable T item) {
-        return mObjects.indexOf(item);
     }
 
     /**
@@ -310,12 +356,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     private ListFilter mFilter;
     private ArrayList<T> mNewFilterValues;
 
-    public Filter getFilter(FilterCompareCallback filterCompareCallback) {
+    public @Nullable Filter getFilter(FilterCompareCallback filterCompareCallback) {
         mFilter = (ListFilter) getFilter();
         mFilter.setFilterCompareCallback(filterCompareCallback);
         return mFilter;
     }
-    public Filter getFilter() {
+    public @Nullable Filter getFilter() {
         if (mFilter == null) {
             mFilter = new ListFilter();
         }

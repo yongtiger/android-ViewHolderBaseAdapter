@@ -202,7 +202,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             if (mOriginalValues != null) mOriginalValues.remove(object);
             mObjects.remove(object);
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -218,7 +218,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             if (mOriginalValues != null) mOriginalValues.remove(object);
             mObjects.remove(index);
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -231,7 +231,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             if (mNewFilterValues != null) mNewFilterValues.clear();
             if (mOriginalValues != null) mOriginalValues.clear();
         }
-        notifyDataSetChanged();
+        if (mNotifyOnChange) notifyDataSetChanged();
     }
 
     /**
@@ -270,8 +270,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             synchronized (mLock) {
                 mObjects = new ArrayList<T>(mOriginalValues);
             }
-            notifyDataSetChanged();
             mOriginalValues = null;
+            if (mNotifyOnChange) notifyDataSetChanged();
         }
     }
 
@@ -307,13 +307,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
                         }
                         mObjects = list;
                     }
-                    notifyDataSetChanged();
                 } else {
                     synchronized (mLock) {
                         mObjects = new ArrayList<T>(mOriginalValues);
                     }
-                    notifyDataSetChanged();
                 }
+                if (mNotifyOnChange) notifyDataSetChanged();
             }
 
             mNewSortValues = null;
@@ -346,7 +345,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
             }
 
             mObjects = list;
-            notifyDataSetChanged();
+            if (mNotifyOnChange) notifyDataSetChanged();
         }
     }
 
@@ -430,10 +429,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
         protected void publishResults(CharSequence constraint, FilterResults results) {
             //noinspection unchecked
             mObjects = (List<T>) results.values;
-            if (results.count > 0) {
-                notifyDataSetChanged();
-            } else {
-                notifyDataSetInvalidated();
+            if (mNotifyOnChange) {
+                if (results.count > 0) {
+                    notifyDataSetChanged();
+                } else {
+                    notifyDataSetInvalidated();
+                }
             }
         }
     }

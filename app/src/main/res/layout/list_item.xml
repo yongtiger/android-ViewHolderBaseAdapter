@@ -1,51 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<cc.brainbook.view.checkableframelayout.CheckableFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cfl_checkable_frame_layout"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/iv_img"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="5px" />
+    <CheckBox
+        android:id="@+id/cb_check_box"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:clickable="false"
+        android:focusable="false" />
 
     <LinearLayout
-        android:layout_width="200dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginStart="50dp">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="22sp" />
+        <ImageView
+            android:id="@+id/iv_img"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:contentDescription="image" />
 
-        <TextView
-            android:id="@+id/tv_info"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/tv_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:focusable="false"
+            android:text="Button" />
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:focusable="false"
-        android:text="Button" />
-
-    <CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@android:id/text1"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeightSmall"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd" />
-
-</LinearLayout>
+</cc.brainbook.view.checkableframelayout.CheckableFrameLayout>

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/ll_buttons"
+        android:id="@+id/ll_sort_filter"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
         <Button android:id="@+id/btn_sort"
             android:layout_width="wrap_content"
@@ -29,7 +32,7 @@
         android:id="@+id/et_filter_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ll_buttons"
+        android:layout_below="@+id/ll_sort_filter"
         android:visibility="gone">
         <requestFocus />
     </EditText>
@@ -41,24 +44,48 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/et_filter_text"
-        android:layout_above="@id/reverse_sel"
+        android:layout_above="@id/ll_batch_select_action"
         android:choiceMode="multipleChoice"
         android:fastScrollEnabled="true" />
 
-    <Button android:id="@+id/reverse_sel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/all_sel"
-        android:text="反选" />
-    <Button android:id="@+id/all_sel"
+    <LinearLayout
+        android:id="@+id/ll_batch_select_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/all_unsel"
-        android:text="全选" />
-    <Button android:id="@+id/all_unsel"
+        android:layout_above="@+id/ll_select"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <Button android:id="@+id/batch_select_action_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="批量删除"
+            android:onClick="clickBatchSelectActionDelete"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="全部取消" />
+        android:gravity="center">
+
+        <Button android:id="@+id/all_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="全选" />
+
+        <Button android:id="@+id/all_unselect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="全不选" />
+
+        <Button android:id="@+id/reverse_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="反选" />
+
+    </LinearLayout>
 
 </RelativeLayout>

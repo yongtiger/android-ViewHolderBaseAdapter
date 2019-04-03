@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven' ///jitpack
+apply plugin: 'com.github.dcendents.android-maven' ///maven
 
-group = 'com.github.yongtiger'  ///jitpack: com.github.<github-username>
+group = 'com.github.yongtiger'  ///maven: com.github.<github-username>
 
 android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"

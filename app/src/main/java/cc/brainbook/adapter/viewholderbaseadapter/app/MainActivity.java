@@ -1,4 +1,4 @@
-package cc.brainbook.adapter.viewholderbaseadapter;
+package cc.brainbook.adapter.viewholderbaseadapter.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import cc.brainbook.adapter.viewholderbaseadapter.ViewHolderBaseAdapter;
 import cc.brainbook.view.checkableframelayout.CheckableFrameLayout;
 
 public class MainActivity extends Activity {

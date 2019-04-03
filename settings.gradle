@@ -1,1 +1,1 @@
-include ':app', ':viewholderbaseadapter'
+include ':viewholderbaseadapter', ':app'

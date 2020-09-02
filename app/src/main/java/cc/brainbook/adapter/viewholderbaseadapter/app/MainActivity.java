@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
         btnSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                android.support.v7.app.AlertDialog.Builder singleChoiceDialog = new android.support.v7.app.AlertDialog.Builder(MainActivity.this);
+                androidx.appcompat.app.AlertDialog.Builder singleChoiceDialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
                 singleChoiceDialog.setTitle("排序");
                 singleChoiceDialog.setSingleChoiceItems(items, mSortChoice,  // 第二个参数是默认选项，设置为-1，表示没有任何选项被选中
                         new DialogInterface.OnClickListener() {
@@ -303,7 +303,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "clickBatchSelectActionDelete: checkedItemIds: " + checkedItemIds);
 
         if (!checkedItemIds.isEmpty()) {
-            new android.support.v7.app.AlertDialog.Builder(MainActivity.this)
+            new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
                     .setMessage("确定批量删除(" + checkedItemIds.size() + ")条记录吗？")
                     .setPositiveButton("删除", new DialogInterface.OnClickListener() {
                         @Override

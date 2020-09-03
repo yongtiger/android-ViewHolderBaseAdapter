@@ -3,14 +3,12 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 30
 
-
-
     defaultConfig {
         applicationId "cc.brainbook.adapter.viewholderbaseadapter"
         minSdkVersion 15
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 10001
+        versionName "1.0.1"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -35,6 +33,6 @@ dependencies {
 
     implementation 'org.jetbrains:annotations-java5:15.0'
 
-    implementation 'com.github.yongtiger:android-CheckableFrameLayout:v1.0.0'
+    implementation 'com.github.yongtiger:android-CheckableFrameLayout:v1.0.1'
     implementation project(':viewholderbaseadapter')
 }

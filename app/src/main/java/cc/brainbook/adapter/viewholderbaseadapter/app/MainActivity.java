@@ -16,6 +16,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -114,12 +115,12 @@ public class MainActivity extends Activity {
             public void afterTextChanged(Editable arg0) {
                 final String constraintString = arg0.toString().trim().toLowerCase(Locale.getDefault());
 //                final String constraintString = editTextfilterText.getText().toString().toLowerCase(Locale.getDefault());
-                mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<Map<String, Object>>() {
+                ((Filter) mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<Map<String, Object>>() {
                     @Override
                     public boolean filterCompare(Map<String, Object> object, CharSequence constraint) {
                         return object.get("title").toString().toLowerCase(Locale.getDefault()).indexOf(constraint.toString()) != -1;
                     }
-                }).filter(constraintString);
+                })).filter(constraintString);
 
                 // 延迟后才能获取准确的getCount()
                 new Handler().postDelayed(new Runnable() {

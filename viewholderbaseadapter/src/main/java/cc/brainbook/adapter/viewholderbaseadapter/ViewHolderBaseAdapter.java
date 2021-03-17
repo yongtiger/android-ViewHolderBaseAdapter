@@ -355,12 +355,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     private ListFilter mFilter;
     private ArrayList<T> mNewFilterValues;
 
-    public @NonNull Filter getFilter(FilterCompareCallback<T> filterCompareCallback) {
-        mFilter = (ListFilter) getFilter();
+    public @NonNull ListFilter getFilter(FilterCompareCallback<T> filterCompareCallback) {
+        mFilter = getFilter();
         mFilter.setFilterCompareCallback(filterCompareCallback);
         return mFilter;
     }
-    public @NonNull Filter getFilter() {
+    public @NonNull ListFilter getFilter() {
         if (mFilter == null) {
             mFilter = new ListFilter();
         }

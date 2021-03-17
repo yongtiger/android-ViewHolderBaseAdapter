@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
     private static final String TAG = "TAG";
 
     private ListView mListView;
-    private ViewHolderBaseAdapter mAdapter;
+    private ViewHolderBaseAdapter<Map<String, Object>> mAdapter;
 
     private final String[] items = { "按标题正序", "按标题倒序"};
     private int mSortChoice = -1;
@@ -114,9 +114,9 @@ public class MainActivity extends Activity {
             public void afterTextChanged(Editable arg0) {
                 final String constraintString = arg0.toString().trim().toLowerCase(Locale.getDefault());
 //                final String constraintString = editTextfilterText.getText().toString().toLowerCase(Locale.getDefault());
-                mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<HashMap<String, Object>>() {
+                mAdapter.getFilter(new ViewHolderBaseAdapter.FilterCompareCallback<Map<String, Object>>() {
                     @Override
-                    public boolean filterCompare(HashMap<String, Object> object, CharSequence constraint) {
+                    public boolean filterCompare(Map<String, Object> object, CharSequence constraint) {
                         return object.get("title").toString().toLowerCase(Locale.getDefault()).indexOf(constraint.toString()) != -1;
                     }
                 }).filter(constraintString);
@@ -250,7 +250,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    private ArrayList<Long> getCheckedItemIds(@NotNull Adapter adapter) {
+    @NonNull
+    private ArrayList<Long> getCheckedItemIds(@NonNull Adapter adapter) {
         final ArrayList list = new ArrayList();
         for (int i = 0; i < adapter.getCount(); i++){
             final HashMap data = (HashMap) adapter.getItem(i);
@@ -263,7 +264,8 @@ public class MainActivity extends Activity {
         return list;
     }
 
-    private ArrayList getCheckedItems(@NotNull Adapter adapter) {
+    @NonNull
+    private ArrayList getCheckedItems(@NonNull Adapter adapter) {
         final ArrayList list = new ArrayList();
         for (int i = 0; i < adapter.getCount(); i++){
             final HashMap data = (HashMap) adapter.getItem(i);
@@ -275,7 +277,7 @@ public class MainActivity extends Activity {
         return list;
     }
 
-    private void removeCheckedItems(@NotNull ViewHolderBaseAdapter adapter) {
+    private void removeCheckedItems(@NonNull ViewHolderBaseAdapter adapter) {
         for (int i = adapter.getCount() - 1; i >= 0 ; i--){
             final HashMap data = (HashMap) adapter.getItem(i);
             final boolean checked = (boolean) data.get("checked");
@@ -285,7 +287,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void showOrHideBatchSelectAction(@NotNull Adapter adapter) {
+    private void showOrHideBatchSelectAction(@NonNull Adapter adapter) {
         // 如果存在选中item，则显示批量处理
         final LinearLayout linearLayoutBatchSelectAction = findViewById(R.id.ll_batch_select_action);
         final int checkedItemIdsCount = getCheckedItemIds(adapter).size();
@@ -325,7 +327,7 @@ public class MainActivity extends Activity {
         }
     }
 
-
+    @NonNull
     private List getData() {
         final List list = new ArrayList();
 
@@ -430,9 +432,9 @@ public class MainActivity extends Activity {
 
     private void sort(final int sortMode) {
         ///https://stackoverflow.com/questions/9906464/sort-listview-with-array-adapter
-        mAdapter.sort(new Comparator<HashMap>() {
+        mAdapter.sort(new Comparator<Map>() {
             @Override
-            public int compare(HashMap lhs, HashMap rhs) {
+            public int compare(Map lhs, Map rhs) {
                 if (sortMode == 0) {
                     return lhs.get("title").toString()
                             .compareTo(rhs.get("title").toString());

@@ -26,7 +26,7 @@ import java.util.List;
  */
 public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements Filterable {
     private List<T> mObjects;
-    private int mLayoutRes;
+    private final int mLayoutRes;
 
     /**
      * Lock used to modify the content of {@link #mObjects}. Any write operation
@@ -239,8 +239,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      */
     public static class ViewHolder {
 
-        private View mConvertView;
-        private SparseArray<View> mViews;
+        private final View mConvertView;
+        private final SparseArray<View> mViews;
 
         public ViewHolder(View convertView) {
             this.mConvertView = convertView;
@@ -355,12 +355,12 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
     private ListFilter mFilter;
     private ArrayList<T> mNewFilterValues;
 
-    public @Nullable Filter getFilter(FilterCompareCallback filterCompareCallback) {
+    public @NonNull Filter getFilter(FilterCompareCallback<T> filterCompareCallback) {
         mFilter = (ListFilter) getFilter();
         mFilter.setFilterCompareCallback(filterCompareCallback);
         return mFilter;
     }
-    public @Nullable Filter getFilter() {
+    public @NonNull Filter getFilter() {
         if (mFilter == null) {
             mFilter = new ListFilter();
         }
@@ -375,8 +375,8 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
      * https://stackoverflow.com/questions/14663725/list-view-filter-android
      */
     private class ListFilter extends Filter {
-        private FilterCompareCallback mFilterCompareCallback;
-        public void setFilterCompareCallback(FilterCompareCallback filterCompareCallback) {
+        private FilterCompareCallback<T> mFilterCompareCallback;
+        public void setFilterCompareCallback(FilterCompareCallback<T> filterCompareCallback) {
             mFilterCompareCallback = filterCompareCallback;
         }
 
@@ -426,7 +426,7 @@ public abstract  class ViewHolderBaseAdapter<T> extends BaseAdapter implements F
         }
 
         @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
+        protected void publishResults(CharSequence constraint, @NonNull FilterResults results) {
             //noinspection unchecked
             mObjects = (List<T>) results.values;
             if (mNotifyOnChange) {

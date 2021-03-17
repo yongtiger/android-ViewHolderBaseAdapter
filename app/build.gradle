@@ -1,17 +1,20 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion setup.compileSdk
+    buildToolsVersion setup.buildTools
 
     defaultConfig {
         applicationId "cc.brainbook.adapter.viewholderbaseadapter"
-        minSdkVersion 15
-        targetSdkVersion 30
-        versionCode 10001
-        versionName "1.0.1"
 
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        minSdkVersion setup.minSdk
+        targetSdkVersion setup.targetSdk
+        versionCode release.versionCode
+        versionName release.versionName
 
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -21,18 +24,19 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':viewholderbaseadapter')
+
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation 'org.jetbrains:annotations-java5:15.0'
+    implementation 'com.github.yongtiger:android-CheckableFrameLayout:v1.0.3'
 
-    implementation 'com.github.yongtiger:android-CheckableFrameLayout:v1.0.1'
-    implementation project(':viewholderbaseadapter')
 }

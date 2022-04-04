@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdkVersion setup.compileSdk
-    buildToolsVersion setup.buildTools
+//    buildToolsVersion setup.buildTools
 
     defaultConfig {
         applicationId "cc.brainbook.adapter.viewholderbaseadapter"
@@ -36,6 +36,6 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
 
-    implementation 'com.github.yongtiger:android-CheckableFrameLayout:v1.2.0'
+    implementation 'com.github.yongtiger:android-CheckableFrameLayout:v1.3.0'
 
 }
